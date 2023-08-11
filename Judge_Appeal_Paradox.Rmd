@@ -1,0 +1,53 @@
+**Imagine a criminal appeals court consisting of five judges; let's call them** $A,B,C,D,$ and $E.$ The judges meet regularly to vote (independently, of course) on the fate of prisoners who have petitioned for a review of their convictions. The result of each of the court's deliberations is determined by a simple majority; for a petitioner to be granted or denied a new trial requires three or more votes. Based on long-term record keeping, it is known that $A$ votes correctly $95\%$ of the time; i.e., when $A$ votes to either uphold or to reverse the original conviction, he is wrong only $5\%$ of the time. Similarly, $B, C, D,$ and $E$ vote correctly $95\%,90\%,90\%,$ and $80\%$ of the time. (There are, of course, two different ways a judge can make a mistake. The judge may uphold a conviction, with new evidence later showing that the petitioner was in fact innocent. Or the judge may vote to reverse a conviction when in fact the petitioner is actually guilty, as determined by the result of a second conviction at the new trial.) Suppose we want to calculate the probability that the court, as an entity, makes an incorrect decision.
+
+Solution:
+
+Let P_A, P_B, P_C, P_D and P_E be the vectors consisting of probabilities of correct and incorrect decisions made by the judges A, B, C, D and E respectively.
+
+```{r}
+P_A = c(0.95,0.05)
+P_B = c(0.95,0.05)
+P_C = c(0.9,0.1)
+P_D = c(0.9,0.1)
+P_E = c(0.8,0.2)
+```
+Let S be the sample space which contains (1,0) where 1 corresponds to a right decision and 0 corresponds to a wrong decision made by a judge.
+```{r}
+S = c(1,0)
+```
+Arrange probabilities corresponds to 5 judges in matrix form for further calculations: 
+```{r}
+P = matrix(nrow = 5, ncol = 2, c(P_A,P_B,P_C,P_D,P_E), byrow = TRUE)
+rownames(P) = c('Judge A','Judge B','Judge C','Judge D','Judge E')
+colnames(P) = c('Correct','Incorrect')
+print(P)
+```
+Simulate a random experiment of 5 judges giving their decisions.
+```{r}
+Judges_Decision = function(){
+  result = numeric(5)
+  for(i in c(1:5)){
+    result[i] = sample(S,size = 1,prob = P[i, ])
+  }
+  return(result)
+}
+```
+Now simulate random experiment large number of times for better accuracy and outcome:
+```{r}
+n_simulations = 100000
+sim_data = replicate(n_simulations,Judges_Decision())
+```
+Lets write function to find probability of the court making an incorrect decision. As the decision of court is the decision of majority of judges, we conclude that a judgement is correct if 3 or more judges are correct.
+```{r}
+check = function(data){
+  return(sum(data) < 3)
+}
+prob = mean(apply(sim_data,2,check))
+print(prob)
+```
+Percentage representation of the court making a wrong decision is:
+```{r}
+prob*100
+```
+
+
